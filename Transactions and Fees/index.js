@@ -29,6 +29,21 @@ const DEMO_FROM_SECRET_KEY = new Uint8Array(
       ]            
 );
 
+// Get the wallet balance from a given public key
+const getWalletBalance = async (name, pubKey) => {
+    try {
+        // Connect to the Devnet
+        const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+
+        const walletBalance = await connection.getBalance(
+            new PublicKey(pubKey)
+        );
+        console.log(`${name} Wallet balance: ${parseInt(walletBalance) / LAMPORTS_PER_SOL} SOL`);
+    } catch (err) {
+        console.log(err);
+    }
+};
+
 const transferSol = async() => {
     const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
 
@@ -38,12 +53,18 @@ const transferSol = async() => {
     // Generate another Keypair (account we'll be sending to)
     const to = Keypair.generate();
 
+    await getWalletBalance("from", from.publicKey)
+    await getWalletBalance("to", to.publicKey)
+
     // Aidrop 2 SOL to Sender wallet
     console.log("Airdopping some SOL to Sender wallet!");
     const fromAirDropSignature = await connection.requestAirdrop(
         new PublicKey(from.publicKey),
         2 * LAMPORTS_PER_SOL
     );
+
+    await getWalletBalance("from", from.publicKey)
+    await getWalletBalance("to", to.publicKey)
 
     // Latest blockhash (unique identifer of the block) of the cluster
     let latestBlockHash = await connection.getLatestBlockhash();
@@ -74,6 +95,9 @@ const transferSol = async() => {
         [from]
     );
     console.log('Signature is', signature);
+
+    await getWalletBalance("from", from.publicKey)
+    await getWalletBalance("to", to.publicKey)
 }
 
 transferSol();
