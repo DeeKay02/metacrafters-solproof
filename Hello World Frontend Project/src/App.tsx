@@ -108,6 +108,14 @@ export default function App() {
     }
   };
 
+  function sleep(milliseconds) {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+      currentDate = Date.now();
+    } while (currentDate - date < milliseconds);
+  }
+
   const createAccount = async () => {
     // Create a new keypair
     const newPair = Keypair.generate();
@@ -115,15 +123,22 @@ export default function App() {
 
   try {
     // Connect to the Devnet and make a wallet from privateKey
-    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    const connection1 = new Connection(clusterApiUrl("devnet"), "confirmed");
   
     // Request airdrop of 2 SOL to the wallet
     console.log("Airdropping some SOL to my wallet!");
-    const fromAirDropSignature = await connection.requestAirdrop(
+    const fromAirDropSignature = await connection1.requestAirdrop(
         new PublicKey(newPair.publicKey),
         2 * LAMPORTS_PER_SOL
     );
-    await connection.confirmTransaction(fromAirDropSignature);
+    await connection1.confirmTransaction(fromAirDropSignature);
+  sleep(5000);
+  const fromAirDropSignature2 = await connection1.requestAirdrop(
+    new PublicKey(newPair.publicKey),
+    1 * LAMPORTS_PER_SOL
+  );
+  await connection1.confirmTransaction(fromAirDropSignature2);
+  
   } catch (error) {
     console.log(error);
   }
@@ -138,7 +153,7 @@ export default function App() {
       SystemProgram.transfer({
           fromPubkey: senderKeypair.publicKey,
           toPubkey: new PublicKey(walletKey.toString()),
-          lamports: 1.5 * LAMPORTS_PER_SOL
+          lamports: 2 * LAMPORTS_PER_SOL
       })
     );
 
