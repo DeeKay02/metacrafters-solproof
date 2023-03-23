@@ -1,1 +1,1 @@
-# Metacrafters' SOL PROOF: Beginner and Intermediate Course Practice
+# Metacrafters' SOL PROOF: Beginner Course Practice
